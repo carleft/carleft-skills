@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+
+# Local scan output and manifests
+macos-cleanup-plan*.json
+plan*.json
+*.local.json
