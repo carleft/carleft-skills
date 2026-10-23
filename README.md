@@ -1,12 +1,52 @@
 # carleft-skills
 
-个人 Qoder 技能合集。
+个人技能合集，遵循 [Agent Skills](https://skills.sh/) 规范，可直接用 skills CLI 安装到 Claude Code、Codex、Qoder、Cursor 等支持 skills 的 agent。
+
+## 安装
+
+全局安装（用户级）：
+
+```bash
+npx skills add carleft/carleft-skills -s macos-cleanup -g
+```
+
+项目级安装（写入当前项目）：
+
+```bash
+npx skills add carleft/carleft-skills -s macos-cleanup
+```
+
+安装到所有检测到的 agent：
+
+```bash
+npx skills add carleft/carleft-skills -s macos-cleanup -a '*'
+```
+
+先看看仓库里有哪些技能、再决定装哪个：
+
+```bash
+npx skills add carleft/carleft-skills -l
+```
+
+> 仓库当前是私有的，只有获得访问权限的账号可以安装。想公开给别人用，把仓库改为 Public 即可被 `npx skills find` 检索。
+
+### 手动安装
+
+把 `skills/macos-cleanup/` 复制到所用 agent 的 skills 目录，例如：
+
+```bash
+# Claude Code
+cp -R skills/macos-cleanup ~/.claude/skills/
+
+# Qoder
+cp -R skills/macos-cleanup ~/.qoder/skills/
+```
 
 ## 技能列表
 
 | 技能 | 说明 |
 |---|---|
-| [macos-cleanup](macos-cleanup/) | macOS 清理规划与执行：只读扫描 → 分级计划 → 逐项确认 → 移入废纸篓并可回滚 |
+| [macos-cleanup](skills/macos-cleanup/) | macOS 清理规划与执行：只读扫描 → 分级计划 → 逐项确认 → 移入废纸篓并可回滚 |
 
 ## macos-cleanup
 
@@ -14,41 +54,25 @@
 
 报告分两部分：**可清理项**（按模块，ID 形如 `DEV-01`、`PKG-01`）和**正常软件占用**（应用与包管理器清单，带体积、版本和 shell 调用记录）。后者只用于判断哪些软件奇怪或长期没用，不会被自动列入清理。
 
-### 安装
-
-项目级：
-
-```bash
-mkdir -p .qoder/skills
-cp -R macos-cleanup .qoder/skills/
-```
-
-用户级（所有项目可用）：
-
-```bash
-mkdir -p ~/.qoder/skills
-cp -R macos-cleanup ~/.qoder/skills/
-```
-
 ### 使用
+
+技能激活后由 agent 执行；也可以直接调用脚本：
 
 ```bash
 # 1. 只读规划
-node ~/.qoder/skills/macos-cleanup/scripts/audit.mjs --out ~/Desktop/plan.json
+node <skill-dir>/scripts/audit.mjs --out ~/Desktop/plan.json
 
 # 2. 预演（默认不改动）
-node ~/.qoder/skills/macos-cleanup/scripts/apply.mjs \
-  --plan ~/Desktop/plan.json --approve DEV-01,PKG-01
+node <skill-dir>/scripts/apply.mjs --plan ~/Desktop/plan.json --approve DEV-01,PKG-01
 
 # 3. 执行
-node ~/.qoder/skills/macos-cleanup/scripts/apply.mjs \
-  --plan ~/Desktop/plan.json --approve DEV-01,PKG-01 --execute
+node <skill-dir>/scripts/apply.mjs --plan ~/Desktop/plan.json --approve DEV-01,PKG-01 --execute
 ```
 
 回滚：
 
 ```bash
-node ~/.qoder/skills/macos-cleanup/scripts/apply.mjs \
+node <skill-dir>/scripts/apply.mjs \
   --undo "$HOME/Library/Application Support/macos-cleanup/manifests/<timestamp>.json"
 ```
 
